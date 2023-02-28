@@ -7,8 +7,8 @@
 
 const app = {
   app_id: 9000,
-  title: 'My Awesome E-Com Plus App',
-  slug: 'my-awesome-app',
+  title: 'Custom shipping Firebase',
+  slug: 'custom-shipping-fb',
   type: 'external',
   state: 'active',
   authentication: true,
@@ -22,7 +22,7 @@ const app = {
      * Triggered to calculate shipping options, must return values and deadlines.
      * Start editing `routes/ecom/modules/calculate-shipping.js`
      */
-    // calculate_shipping:   { enabled: true },
+    calculate_shipping:   { enabled: true },
 
     /**
      * Triggered to validate and apply discount value, must return discount and conditions.
@@ -138,37 +138,229 @@ const app = {
   },
 
   admin_settings: {
-    /**
-     * JSON schema based fields to be configured by merchant and saved to app `data` / `hidden_data`, such as:
-
-     webhook_uri: {
-       schema: {
-         type: 'string',
-         maxLength: 255,
-         format: 'uri',
-         title: 'Notifications URI',
-         description: 'Unique notifications URI available on your Custom App dashboard'
-       },
-       hide: true
-     },
-     token: {
-       schema: {
-         type: 'string',
-         maxLength: 50,
-         title: 'App token'
-       },
-       hide: true
-     },
-     opt_in: {
-       schema: {
-         type: 'boolean',
-         default: false,
-         title: 'Some config option'
-       },
-       hide: false
-     },
-
-     */
+    zip: {
+      schema: {
+        type: 'string',
+        maxLength: 9,
+        pattern: '^[0-9]{5}-?[0-9]{3}$',
+        title: 'CEP de origem',
+        description: 'Código postal do remetente ou centro de distribuição'
+      },
+      hide: true
+    },
+    services: {
+      schema: {
+        title: 'Serviços de entrega personalizados',
+        type: 'array',
+        maxItems: 50,
+        items: {
+          title: 'Opção de serviço de entrega',
+          type: 'object',
+          required: [
+            'service_code'
+          ],
+          properties: {
+            label: {
+              type: 'string',
+              maxLength: 50,
+              title: 'Rótulo',
+              description: 'Nome do serviço exibido aos clientes'
+            },
+            carrier: {
+              type: 'string',
+              maxLength: 200,
+              title: 'Transportadora'
+            },
+            service_code: {
+              type: 'string',
+              maxLength: 10,
+              pattern: '^[A-Za-z0-9-_.]+$',
+              title: 'Código do serviço'
+            }
+          }
+        }
+      },
+      hide: true
+    },
+    posting_deadline: {
+      schema: {
+        title: 'Prazo de postagem',
+        type: 'object',
+        required: [
+          'days'
+        ],
+        additionalProperties: false,
+        properties: {
+          days: {
+            type: 'integer',
+            minimum: 0,
+            maximum: 999999,
+            title: 'Número de dias',
+            description: 'Dias de prazo para postar os produtos após a compra'
+          },
+          working_days: {
+            type: 'boolean',
+            default: true,
+            title: 'Dias úteis'
+          },
+          after_approval: {
+            type: 'boolean',
+            default: true,
+            title: 'Após aprovação do pagamento'
+          }
+        }
+      },
+      hide: true
+    },
+    additional_price: {
+      schema: {
+        type: 'number',
+        minimum: -999999,
+        maximum: 999999,
+        title: 'Custo adicional',
+        description: 'Valor a adicionar (negativo para descontar) em todas as regras de frete personalizado'
+      },
+      hide: true
+    },
+    shipping_rules: {
+      schema: {
+        title: 'Regras de envio',
+        description: 'Valor do frete e previsão de entrega condicionados. Tabela exemplo https://bit.ly/34ZhqVg',
+        type: 'array',
+        maxItems: 1000,
+        items: {
+          title: 'Regra de envio',
+          type: 'object',
+          required: [
+            'service_code',
+            'delivery_time',
+            'total_price'
+          ],
+          properties: {
+            service_code: {
+              type: 'string',
+              maxLength: 10,
+              pattern: '^[A-Za-z0-9-_.]+$',
+              title: 'Código do serviço'
+            },
+            zip_range: {
+              title: 'Faixa de CEP atendida',
+              type: 'object',
+              required: [
+                'min',
+                'max'
+              ],
+              properties: {
+                min: {
+                  type: 'integer',
+                  minimum: 10000,
+                  maximum: 999999999,
+                  title: 'CEP inicial'
+                },
+                max: {
+                  type: 'integer',
+                  minimum: 10000,
+                  maximum: 999999999,
+                  title: 'CEP final'
+                }
+              }
+            },
+            min_amount: {
+              type: 'number',
+              minimum: 1,
+              maximum: 999999999,
+              title: 'Valor mínimo da compra'
+            },
+            max_cubic_weight: {
+              type: 'number',
+              minimum: 0,
+              maximum: 999999,
+              title: 'Peso máximo',
+              description: 'Peso cúbico (C x L x A / 6.000) máximo em Kg'
+            },
+            delivery_time: {
+              title: 'Prazo de entrega',
+              type: 'object',
+              required: [
+                'days'
+              ],
+              additionalProperties: false,
+              properties: {
+                days: {
+                  type: 'integer',
+                  minimum: 0,
+                  maximum: 999999,
+                  default: 20,
+                  title: 'Prazo de entrega (dias)',
+                  description: 'Número de dias estimado para entrega após o despacho'
+                },
+                working_days: {
+                  type: 'boolean',
+                  default: true,
+                  title: 'Dias úteis',
+                  description: 'Se o prazo é calculado em dias úteis'
+                }
+              }
+            },
+            total_price: {
+              type: 'number',
+              minimum: 0,
+              maximum: 9999999999,
+              title: 'Preço',
+              description: 'Valor do frete com possíveis taxas e adicionais fixos'
+            },
+            disable_free_shipping_from: {
+              type: 'boolean',
+              default: false,
+              title: 'Não informar frete grátis',
+              description: 'Desabilita esta regra nas mensagens \'frete grátis a partir\''
+            },
+            excedent_weight_cost: {
+              type: 'number',
+              minimum: 0,
+              maximum: 99999999,
+              title: 'Custo por peso excedente',
+              description: 'Valor adicional variável por Kg (peso cúbico) excedente'
+            },
+            amount_tax: {
+              type: 'number',
+              minimum: -100,
+              maximum: 100,
+              title: 'Taxa sobre o subtotal',
+              description: 'Adicional/desconto percentual sobre o valor subtotal da compra'
+            },
+            delivery_instructions: {
+              type: 'string',
+              maxLength: 1000,
+              title: 'Instruçoes de entrega',
+              description: 'Insira informações adicionais para retirada ou entrega do pedido'
+            },
+            product_ids: {
+              title: 'Lista de produtos para frete grátis',
+              description: 'Se preenchido, será dado frete grátis',
+              type: 'array',
+              items: {
+                type: 'string',
+                pattern: '^[a-f0-9]{24}$',
+                title: 'ID do produto'
+              }
+            },
+            category_ids: {
+              title: 'Lista de categorias para frete grátis',
+              hint: 'Se preenchido categoria, será valido apenas categorias para validação do frete e não lista de produtos',
+              description: 'Se preenchido, será dado frete grátis',
+              type: 'array',
+              items: {
+                type: 'string',
+                pattern: '^[a-f0-9]{24}$',
+                title: 'ID da categoria'
+              }
+            }
+          }
+        }
+      },
+      hide: true
+    }
   }
 }
 
