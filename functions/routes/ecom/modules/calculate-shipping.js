@@ -185,8 +185,14 @@ exports.post = ({ appSdk }, req, res) => {
           if (Array.isArray(rule.product_ids) && rule.product_ids.length) {
             const isFreeShippingAllProducts = config.free_shipping_all || false 
             const hasProduct = isFreeShippingAllProducts
-              ? params.items.every(item => rule.product_ids.indexOf(item.product_id) > -1)
-              : params.items.some(item => rule.product_ids.indexOf(item.product_id) > -1)
+              ? params.items.every(item => {
+                console.log('entrei no every', JSON.stringify(item), rule.product_ids.indexOf(item.product_id))
+                return rule.product_ids.indexOf(item.product_id) > -1
+              })
+              : params.items.some(item => {
+                console.log('entrei no some', JSON.stringify(item), rule.product_ids.indexOf(item.product_id))
+                return rule.product_ids.indexOf(item.product_id) > -1
+              })
             console.log('Teste carrinho:', isFreeShippingAllProducts, hasProduct)
             if (hasProduct) {
               rule.total_price = 0
