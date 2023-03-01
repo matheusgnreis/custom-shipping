@@ -183,7 +183,7 @@ exports.post = ({ appSdk }, req, res) => {
             rule.total_price += (rule.amount_tax * amount / 100)
           }
           if (Array.isArray(rule.product_ids) && rule.product_ids.length) {
-            const isFreeShippingAllProducts = config.free_shipping_all || false 
+            const isFreeShippingAllProducts = rule.free_shipping_all || false 
             const hasProduct = isFreeShippingAllProducts
               ? params.items.every(item => {
                 console.log('entrei no every', JSON.stringify(item), rule.product_ids.indexOf(item.product_id))
