@@ -169,6 +169,7 @@ exports.post = ({ appSdk }, req, res) => {
       if (validShippingRules.length) {
         // group by service code selecting lower price
         const shippingRulesByCode = validShippingRules.reduce((shippingRulesByCode, rule) => {
+          console.log('Regra:', JSON.stringify(rule))
           if (typeof rule.total_price !== 'number') {
             rule.total_price = 0
           }
@@ -186,6 +187,7 @@ exports.post = ({ appSdk }, req, res) => {
           }
           if (Array.isArray(rule.product_ids) && rule.product_ids.length) {
             const hasProduct = params.items.some(item => rule.product_ids.indexOf(item.product_id) > 1)
+            console.log('Achou produto', hasProduct)
             if (hasProduct) {
               rule.total_price = 0
             }
