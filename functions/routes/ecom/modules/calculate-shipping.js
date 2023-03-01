@@ -183,8 +183,10 @@ exports.post = ({ appSdk }, req, res) => {
             rule.total_price += (rule.amount_tax * amount / 100)
           }
           if (Array.isArray(rule.product_ids) && rule.product_ids.length) {
-            const hasProduct = params.items.some(item => rule.product_ids.indexOf(item.product_id) > -1)
-            console.log('Achou produto', hasProduct)
+            const isFreeShippingAllProducts = config.free_shipping_all || false 
+            const hasProduct = isFreeShippingAllProducts
+              ? params.items.every(item => rule.product_ids.indexOf(item.product_id) > -1)
+              : params.items.some(item => rule.product_ids.indexOf(item.product_id) > -1)
             if (hasProduct) {
               rule.total_price = 0
             }
