@@ -7,7 +7,7 @@
 
 const app = {
   app_id: 9000,
-  title: 'Custom shipping Fb',
+  title: 'Custom shipping Firebase',
   slug: 'custom-shipping-fb',
   type: 'external',
   state: 'active',
