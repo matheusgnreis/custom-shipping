@@ -23,6 +23,7 @@ exports.post = ({ appSdk }, req, res) => {
     let shippingRules
     if (Array.isArray(config.shipping_rules) && config.shipping_rules.length) {
       shippingRules = config.shipping_rules
+      console.log('Rules:', JSON.stringify(shippingRules))
     } else {
       // anything to do without shipping rules
       res.send(response)
@@ -46,6 +47,7 @@ exports.post = ({ appSdk }, req, res) => {
     // search for configured free shipping rule and origin zip by rule
     for (let i = 0; i < shippingRules.length; i++) {
       const rule = shippingRules[i]
+      console.log('search for config', JSON.stringify(rule))
       if (
         checkZipCode(rule) &&
         !rule.total_price &&
@@ -158,6 +160,7 @@ exports.post = ({ appSdk }, req, res) => {
       // start filtering shipping rules
       const validShippingRules = shippingRules.filter(rule => {
         if (typeof rule === 'object' && rule) {
+          console.log('Check params', JSON.stringify(params))
           return (!params.service_code || params.service_code === rule.service_code) &&
             checkZipCode(rule) &&
             (!rule.min_amount || amount >= rule.min_amount) &&
@@ -185,14 +188,8 @@ exports.post = ({ appSdk }, req, res) => {
           if (Array.isArray(rule.product_ids) && rule.product_ids.length) {
             const isFreeShippingAllProducts = rule.free_shipping_all || false 
             const hasProduct = isFreeShippingAllProducts
-              ? params.items.every(item => {
-                console.log('entrei no every', JSON.stringify(item), rule.product_ids.indexOf(item.product_id))
-                return rule.product_ids.indexOf(item.product_id) > -1
-              })
-              : params.items.some(item => {
-                console.log('entrei no some', JSON.stringify(item), rule.product_ids.indexOf(item.product_id))
-                return rule.product_ids.indexOf(item.product_id) > -1
-              })
+              ? params.items.every(item => rule.product_ids.indexOf(item.product_id) > -1)
+              : params.items.some(item => rule.product_ids.indexOf(item.product_id) > -1)
             console.log('Teste carrinho:', isFreeShippingAllProducts, hasProduct)
             if (hasProduct) {
               rule.total_price = 0
