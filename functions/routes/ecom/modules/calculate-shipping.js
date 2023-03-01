@@ -29,7 +29,7 @@ exports.post = ({ appSdk }, req, res) => {
       return
     }
 
-    if (Array.isArray(config.services) && config.services.length && shippingRules && shippingRules.length) {
+    if (Array.isArray(config.services) && config.services.length) {
       const { services } = config
       const newShippingRules = shippingRules.map(rule => {
         const foundService = services.find(service => service.service_code === rule.service_code)
