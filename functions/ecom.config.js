@@ -176,6 +176,23 @@ const app = {
               maxLength: 10,
               pattern: '^[A-Za-z0-9-_.]+$',
               title: 'Código do serviço'
+            },
+            free_shipping_all: {
+              type: 'boolean',
+              title: 'Ativar frete grátis para todos itens da lista',
+              description: 'Será dado frete grátis, se todos os itens estiverem no carrinho',
+              default: false
+
+            },
+            product_ids: {
+              title: 'Lista de produtos para frete grátis',
+              description: 'Se preenchido, será dado frete grátis',
+              type: 'array',
+              items: {
+                type: 'string',
+                pattern: '^[a-f0-9]{24}$',
+                title: 'ID do produto'
+              }
             }
           }
         }
@@ -334,23 +351,6 @@ const app = {
               maxLength: 1000,
               title: 'Instruçoes de entrega',
               description: 'Insira informações adicionais para retirada ou entrega do pedido'
-            },
-            free_shipping_all: {
-              type: 'boolean',
-              title: 'Ativar frete grátis para todos itens da lista',
-              description: 'Será dado frete grátis, se todos os itens estiverem no carrinho',
-              default: false
-
-            },
-            product_ids: {
-              title: 'Lista de produtos para frete grátis',
-              description: 'Se preenchido, será dado frete grátis',
-              type: 'array',
-              items: {
-                type: 'string',
-                pattern: '^[a-f0-9]{24}$',
-                title: 'ID do produto'
-              }
             }
           }
         }
