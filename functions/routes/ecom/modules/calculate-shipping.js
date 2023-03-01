@@ -29,6 +29,16 @@ exports.post = ({ appSdk }, req, res) => {
       return
     }
 
+    if (Array.isArray(config.services) && config.services.length && shippingRules && shippingRules.length) {
+      const newShippingRules = shippingRules.map(rule => {
+        const foundService = config.services.find(service => service.service_code === rule.service_code)
+        ['free_shipping_all', 'product_ids'].forEach(prop => {
+          rule[prop] = foundService[prop]
+        })
+        return rule
+      })
+      shippingRules = newShippingRules
+    }
     const destinationZip = params.to ? params.to.zip.replace(/\D/g, '') : ''
     let originZip = params.from
       ? params.from.zip
@@ -46,6 +56,7 @@ exports.post = ({ appSdk }, req, res) => {
     // search for configured free shipping rule and origin zip by rule
     for (let i = 0; i < shippingRules.length; i++) {
       const rule = shippingRules[i]
+      console.log('Rule', JSON.stringify(rule))
       if (
         checkZipCode(rule) &&
         !rule.total_price &&
