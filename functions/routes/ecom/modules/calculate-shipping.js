@@ -30,13 +30,21 @@ exports.post = ({ appSdk }, req, res) => {
     }
 
     if (Array.isArray(config.services) && config.services.length && shippingRules && shippingRules.length) {
+      const { services } = config
       const newShippingRules = shippingRules.map(rule => {
-        const foundService = config.services.find(service => service.service_code === rule.service_code)
-        ['free_shipping_all', 'product_ids'].forEach(prop => {
-          rule[prop] = foundService[prop]
+        console.log('Mapping on rule:', JSON.stringify(rule))
+        const foundService = services.find(service => {
+          console.log('Service:', JSON.stringify(service))
+          return service.service_code === rule.service_code
         })
+        if (foundService) {
+          ['free_shipping_all', 'product_ids'].forEach(prop => {
+            rule[prop] = foundService[prop]
+          })
+        }
         return rule
       })
+      console.log('new array', JSON.stringify(newShippingRules))
       shippingRules = newShippingRules
     }
     const destinationZip = params.to ? params.to.zip.replace(/\D/g, '') : ''
