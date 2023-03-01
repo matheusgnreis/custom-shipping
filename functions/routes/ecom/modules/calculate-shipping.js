@@ -32,11 +32,7 @@ exports.post = ({ appSdk }, req, res) => {
     if (Array.isArray(config.services) && config.services.length && shippingRules && shippingRules.length) {
       const { services } = config
       const newShippingRules = shippingRules.map(rule => {
-        console.log('Mapping on rule:', JSON.stringify(rule))
-        const foundService = services.find(service => {
-          console.log('Service:', JSON.stringify(service))
-          return service.service_code === rule.service_code
-        })
+        const foundService = services.find(service => service.service_code === rule.service_code)
         if (foundService) {
           ['free_shipping_all', 'product_ids'].forEach(prop => {
             rule[prop] = foundService[prop]
@@ -44,7 +40,6 @@ exports.post = ({ appSdk }, req, res) => {
         }
         return rule
       })
-      console.log('new array', JSON.stringify(newShippingRules))
       shippingRules = newShippingRules
     }
     const destinationZip = params.to ? params.to.zip.replace(/\D/g, '') : ''
@@ -64,7 +59,6 @@ exports.post = ({ appSdk }, req, res) => {
     // search for configured free shipping rule and origin zip by rule
     for (let i = 0; i < shippingRules.length; i++) {
       const rule = shippingRules[i]
-      console.log('Rule', JSON.stringify(rule))
       if (
         checkZipCode(rule) &&
         !rule.total_price &&
@@ -188,7 +182,6 @@ exports.post = ({ appSdk }, req, res) => {
       if (validShippingRules.length) {
         // group by service code selecting lower price
         const shippingRulesByCode = validShippingRules.reduce((shippingRulesByCode, rule) => {
-          console.log('Regra:', JSON.stringify(rule))
           if (typeof rule.total_price !== 'number') {
             rule.total_price = 0
           }
