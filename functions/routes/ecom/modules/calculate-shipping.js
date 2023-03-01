@@ -182,11 +182,8 @@ exports.post = ({ appSdk }, req, res) => {
           if (typeof rule.amount_tax === 'number' && !isNaN(rule.amount_tax)) {
             rule.total_price += (rule.amount_tax * amount / 100)
           }
-          const checkProductId = item => {
-            return (!rule.product_ids.length || rule.product_ids.indexOf(item.product_id) > -1)
-          }
           if (Array.isArray(rule.product_ids) && rule.product_ids.length) {
-            const hasProduct = params.items.some(item => rule.product_ids.indexOf(item.product_id) > 1)
+            const hasProduct = params.items.some(item => rule.product_ids.indexOf(item.product_id) > -1)
             console.log('Achou produto', hasProduct)
             if (hasProduct) {
               rule.total_price = 0
