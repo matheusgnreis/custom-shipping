@@ -187,6 +187,7 @@ exports.post = ({ appSdk }, req, res) => {
             const hasProduct = isFreeShippingAllProducts
               ? params.items.every(item => rule.product_ids.indexOf(item.product_id) > -1)
               : params.items.some(item => rule.product_ids.indexOf(item.product_id) > -1)
+            console.log('Teste carrinho:', isFreeShippingAllProducts, hasProduct)
             if (hasProduct) {
               rule.total_price = 0
             }
