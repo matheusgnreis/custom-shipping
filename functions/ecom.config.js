@@ -344,17 +344,6 @@ const app = {
                 pattern: '^[a-f0-9]{24}$',
                 title: 'ID do produto'
               }
-            },
-            category_ids: {
-              title: 'Lista de categorias para frete grátis',
-              hint: 'Se preenchido categoria, será valido apenas categorias para validação do frete e não lista de produtos',
-              description: 'Se preenchido, será dado frete grátis',
-              type: 'array',
-              items: {
-                type: 'string',
-                pattern: '^[a-f0-9]{24}$',
-                title: 'ID da categoria'
-              }
             }
           }
         }
