@@ -335,6 +335,13 @@ const app = {
               title: 'Instruçoes de entrega',
               description: 'Insira informações adicionais para retirada ou entrega do pedido'
             },
+            free_shipping_all: {
+              type: 'boolean',
+              title: 'Ativar frete grátis para todos itens da lista',
+              description: 'Será dado frete grátis, se todos os itens estiverem no carrinho',
+              default: false
+
+            },
             product_ids: {
               title: 'Lista de produtos para frete grátis',
               description: 'Se preenchido, será dado frete grátis',
